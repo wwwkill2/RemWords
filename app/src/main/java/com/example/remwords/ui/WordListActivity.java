@@ -20,6 +20,7 @@ import com.example.remwords.ui.adapter.GroupInfo;
 import com.example.remwords.utils.RandomUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class WordListActivity extends AppCompatActivity {
@@ -73,7 +74,7 @@ public class WordListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 WordDetailActivity.startActivity(WordListActivity.this,
-                        RandomUtil.randomWords(getSelectedWords()), mMode);
+                        getSelectedWords(), mMode);
             }
         });
     }
@@ -85,6 +86,9 @@ public class WordListActivity extends AppCompatActivity {
             if (info.isSelected()) {
                 res.addAll(db.queryWordsByGroupId(info.title));
             }
+        }
+        if (mMode == WordDetailActivity.Mode.MEM) {
+            Collections.shuffle(res);
         }
         return res;
     }

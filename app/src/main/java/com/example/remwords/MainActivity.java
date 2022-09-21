@@ -1,14 +1,15 @@
 package com.example.remwords;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSON;
 import com.example.remwords.db.Word;
@@ -18,21 +19,22 @@ import com.example.remwords.ui.WordListActivity;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private WordDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        db = new WordDatabase(this);
     }
 
     public void memWord(View view) {
-        WordDatabase wordDatabase = new WordDatabase(this);
-        List<Word> words = wordDatabase.queryAllWords();
-//        WordDetailActivity.startActivity(this, words.subList(0, 2), WordDetailActivity.Mode.MEM);
         WordListActivity.startActivity(this, WordDetailActivity.Mode.MEM);
     }
 
@@ -72,11 +74,49 @@ public class MainActivity extends AppCompatActivity {
                         if (words == null || words.isEmpty()) {
                             return;
                         }
-                        WordDatabase wordDatabase = new WordDatabase(MainActivity.this);
-                        wordDatabase.insertOrUpdateWords(words);
+                        db.insertOrUpdateWords(words);
                     }
                 })
                 .setNegativeButton("取消", null);
         builder.show();
+    }
+
+    public void searchWord(View view) {
+        final View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_import, null);
+        final EditText etImport = dialogView.findViewById(R.id.et_import);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("搜单词")
+                .setView(dialogView)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String keyword = etImport.getText().toString();
+                        if (TextUtils.isEmpty(keyword)) {
+                            return;
+                        }
+                        List<Word> words = db.searchWords(keyword);
+                        if (words.isEmpty()) {
+                            Toast.makeText(MainActivity.this, "未查询到相关词汇", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        WordDetailActivity.startActivity(MainActivity.this, words, WordDetailActivity.Mode.STUDY);
+                    }
+                })
+                .setNegativeButton("取消", null);
+        builder.show();
+    }
+
+    public void reviewWord(View view) {
+        List<Word> words = db.queryAllForgetWords();
+        if (words.isEmpty()) {
+            Toast.makeText(this, "没有需要复习的单词", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Collections.shuffle(words);
+        WordDetailActivity.startActivity(this, words, WordDetailActivity.Mode.REVIEW);
+    }
+
+    public void studyWord(View view) {
+        WordListActivity.startActivity(this, WordDetailActivity.Mode.STUDY);
     }
 }

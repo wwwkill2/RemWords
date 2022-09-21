@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.remwords.R;
 import com.example.remwords.db.Word;
+import com.example.remwords.db.WordDatabase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         STUDY, MEM, REVIEW
     }
 
+    private WordDatabase db;
     private TextView mTvProgress;
     private TextView mTvWord;
     private TextView mTvTrans;
@@ -73,9 +76,20 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         mBtnPrev.setOnClickListener(this);
         mBtnNext.setOnClickListener(this);
         mRlContent.setOnClickListener(this);
+        mBtnVague.setOnClickListener(this);
+        if (mMode == Mode.STUDY) {
+            mBtnVague.setVisibility(View.INVISIBLE);
+        } else if (mMode == Mode.MEM) {
+            mBtnVague.setVisibility(View.VISIBLE);
+            mBtnVague.setText("模糊");
+        } else {
+            mBtnVague.setVisibility(View.VISIBLE);
+            mBtnVague.setText("认识");
+        }
     }
 
     private void initData() {
+        db = new WordDatabase(this);
         ArrayList<Parcelable> list = getIntent().getParcelableArrayListExtra(INTENT_ARGS);
         mWords = new ArrayList<>();
         for (Parcelable parcelable : list) {
@@ -90,7 +104,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         Word curWord = mWords.get(mCurWordIndex);
         mTvWord.setText(curWord.word);
         mTvTrans.setText(curWord.trans);
-        if (mMode == Mode.MEM) {
+        if (mMode == Mode.MEM || mMode == Mode.REVIEW) {
             mTvTrans.setVisibility(View.INVISIBLE);
         }
         mTvProgress.setText((mCurWordIndex + 1) + "/" + mWords.size());
@@ -112,12 +126,23 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 }
                 break;
             case R.id.rl_content:
-                if (mMode == Mode.MEM) {
+                if (mMode == Mode.MEM || mMode == Mode.REVIEW) {
                     if (mTvTrans.getVisibility() == View.VISIBLE) {
                         mTvTrans.setVisibility(View.INVISIBLE);
                     } else {
                         mTvTrans.setVisibility(View.VISIBLE);
                     }
+                }
+                break;
+            case R.id.btn_vague:
+                String word = mWords.get(mCurWordIndex).word;
+                if (mMode == Mode.MEM) {
+                    db.markForget(word);
+                    Log.i("TAG", db.queryAllForgetWords().toString());
+                    mBtnNext.performClick();
+                } else if (mMode == Mode.REVIEW) {
+                    db.markRemember(word);
+                    mBtnNext.performClick();
                 }
                 break;
         }

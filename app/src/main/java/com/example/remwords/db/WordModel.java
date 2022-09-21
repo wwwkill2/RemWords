@@ -13,6 +13,7 @@ public class WordModel extends SQLiteOpenHelper {
     public static final String COLUMN_WORD = "word";
     public static final String COLUMN_TRANS = "trans";
     public static final String COLUMN_KEY = "group_id";
+    public static final String COLUMN_FORGET = "forget";
 
     public WordModel(@Nullable Context context) {
         super(context, DB_NAME, null, 1);
@@ -27,6 +28,7 @@ public class WordModel extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " ( " +
                 COLUMN_WORD + " TEXT PRIMARY KEY, " +
                 COLUMN_TRANS + " TEXT, " +
+                COLUMN_FORGET + " INTEGER DEFAULT 0 NOT NULL, " +
                 COLUMN_KEY + " TEXT );");
     }
 
