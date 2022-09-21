@@ -16,9 +16,11 @@ import com.example.remwords.db.Word;
 import com.example.remwords.db.WordDatabase;
 import com.example.remwords.ui.WordDetailActivity;
 import com.example.remwords.ui.WordListActivity;
+import com.example.remwords.utils.SPUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +37,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void memWord(View view) {
-        WordListActivity.startActivity(this, WordDetailActivity.Mode.MEM);
+        List<Word> todayUnfinishedWords = SPUtils.getTodayUnfinishedWords(this);
+        if (todayUnfinishedWords == null || todayUnfinishedWords.isEmpty()) {
+            WordListActivity.startActivity(this, WordDetailActivity.Mode.MEM);
+        } else {
+            new android.app.AlertDialog.Builder(this)
+                    .setMessage("今天还有未完成的单词，继续吗？")
+                    .setPositiveButton("确定", (dialogInterface, i) -> {
+                        WordDetailActivity.startActivity(MainActivity.this, todayUnfinishedWords, WordDetailActivity.Mode.MEM);
+                    })
+                    .setNegativeButton("取消", (dialogInterface, i) -> {
+                        SPUtils.storeTodayUnfinishedWords(MainActivity.this, new ArrayList<>());
+                        WordListActivity.startActivity(this, WordDetailActivity.Mode.MEM);
+                    }).show();
+        }
     }
 
     public void importWord(View view) {

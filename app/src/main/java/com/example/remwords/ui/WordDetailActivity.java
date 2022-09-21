@@ -1,10 +1,11 @@
 package com.example.remwords.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.remwords.R;
 import com.example.remwords.db.Word;
 import com.example.remwords.db.WordDatabase;
+import com.example.remwords.utils.SPUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -138,13 +140,30 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 String word = mWords.get(mCurWordIndex).word;
                 if (mMode == Mode.MEM) {
                     db.markForget(word);
-                    Log.i("TAG", db.queryAllForgetWords().toString());
                     mBtnNext.performClick();
                 } else if (mMode == Mode.REVIEW) {
                     db.markRemember(word);
                     mBtnNext.performClick();
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mMode == Mode.MEM && mCurWordIndex != mWords.size() - 1) {
+            new AlertDialog.Builder(this)
+                    .setMessage("还有剩余单词，想要保留进度吗？")
+                    .setPositiveButton("确定", (dialogInterface, i) -> {
+                        SPUtils.storeTodayUnfinishedWords(WordDetailActivity.this, mWords.subList(mCurWordIndex, mWords.size()));
+                        super.onBackPressed();
+                    })
+                    .setNegativeButton("取消", (dialogInterface, i) -> {
+                        SPUtils.storeTodayUnfinishedWords(WordDetailActivity.this, new ArrayList<>());
+                        super.onBackPressed();
+                    }).show();
+        } else {
+            super.onBackPressed();
         }
     }
 }
