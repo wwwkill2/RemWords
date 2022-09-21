@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">上岸单词</string>
+    <string name="btn_mem_words">背单词</string>
+    <string name="btn_import_words">导入单词</string>
+    <string name="btn_import_words_by_text">从文本导入</string>
+    <string name="btn_prev_word">上一个</string>
+    <string name="btn_next_word">下一个</string>
+    <string name="btn_vague_word">模糊</string>
+    <string name="btn_confirm">确定</string>
+</resources>
