@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,8 +74,13 @@ public class WordListActivity extends AppCompatActivity {
         mBtnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                List<Word> selectedWords = getSelectedWords();
+                if (selectedWords.isEmpty()) {
+                    Toast.makeText(WordListActivity.this, "未选择单词", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 WordDetailActivity.startActivity(WordListActivity.this,
-                        getSelectedWords(), mMode);
+                        selectedWords, mMode);
             }
         });
     }

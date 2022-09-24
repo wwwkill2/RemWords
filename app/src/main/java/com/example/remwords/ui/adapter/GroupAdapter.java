@@ -37,11 +37,9 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         holder.tvTitle.setText(info.title);
         holder.tvMsg.setText(info.message);
         holder.cbSelected.setChecked(info.isSelected());
-        holder.cbSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mData.get(holder.getAdapterPosition()).setSelected(b);
-            }
+        holder.cbSelected.setOnCheckedChangeListener((compoundButton, b) -> mData.get(holder.getAdapterPosition()).setSelected(b));
+        holder.itemView.setOnClickListener(view -> {
+            holder.cbSelected.setChecked(!mData.get(holder.getAdapterPosition()).isSelected());
         });
     }
 

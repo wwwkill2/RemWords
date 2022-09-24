@@ -143,6 +143,9 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                     mBtnNext.performClick();
                 } else if (mMode == Mode.REVIEW) {
                     db.markRemember(word);
+                    if (mCurWordIndex == mWords.size() - 1) {
+                        finish();
+                    }
                     mBtnNext.performClick();
                 }
                 break;
@@ -151,17 +154,22 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onBackPressed() {
-        if (mMode == Mode.MEM && mCurWordIndex != mWords.size() - 1) {
-            new AlertDialog.Builder(this)
-                    .setMessage("还有剩余单词，想要保留进度吗？")
-                    .setPositiveButton("确定", (dialogInterface, i) -> {
-                        SPUtils.storeTodayUnfinishedWords(WordDetailActivity.this, mWords.subList(mCurWordIndex, mWords.size()));
-                        super.onBackPressed();
-                    })
-                    .setNegativeButton("取消", (dialogInterface, i) -> {
-                        SPUtils.storeTodayUnfinishedWords(WordDetailActivity.this, new ArrayList<>());
-                        super.onBackPressed();
-                    }).show();
+        if (mMode == Mode.MEM) {
+            if (mCurWordIndex != mWords.size() - 1) {
+                new AlertDialog.Builder(this)
+                        .setMessage("还有剩余单词，想要保留进度吗？")
+                        .setPositiveButton("确定", (dialogInterface, i) -> {
+                            SPUtils.storeTodayUnfinishedWords(WordDetailActivity.this, mWords.subList(mCurWordIndex, mWords.size()));
+                            super.onBackPressed();
+                        })
+                        .setNegativeButton("取消", (dialogInterface, i) -> {
+                            SPUtils.storeTodayUnfinishedWords(WordDetailActivity.this, new ArrayList<>());
+                            super.onBackPressed();
+                        }).show();
+            } else {
+                SPUtils.storeTodayUnfinishedWords(WordDetailActivity.this, new ArrayList<>());
+                super.onBackPressed();
+            }
         } else {
             super.onBackPressed();
         }
