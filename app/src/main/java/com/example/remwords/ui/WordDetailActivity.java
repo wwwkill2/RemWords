@@ -1,9 +1,10 @@
 package com.example.remwords.ui;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
@@ -17,8 +18,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.remwords.R;
 import com.example.remwords.db.Word;
 import com.example.remwords.db.WordDatabase;
+import com.example.remwords.download.DownloadTask;
 import com.example.remwords.utils.SPUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +44,8 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     private List<Word> mWords;
     private Mode mMode;
     private int mCurWordIndex = 0;
+
+    private MediaPlayer mMediaPlayer;
 
     public static void startActivity(Context context, List<Word> words, Mode mode) {
         Intent intent = new Intent(context, WordDetailActivity.class);
@@ -112,6 +118,11 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         mTvProgress.setText((mCurWordIndex + 1) + "/" + mWords.size());
     }
 
+    public void voice(View view) throws IOException {
+        String word = mWords.get(mCurWordIndex).word;
+        playWordSound(word);
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -172,6 +183,31 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             }
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void playWordSound(String word) throws IOException {
+        File soundFile = new File(getExternalFilesDir(null), word + ".mp3");
+        if (soundFile.exists()) {
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setDataSource(soundFile.getAbsolutePath());
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        } else {
+            new DownloadTask(this, word) {
+                @Override
+                protected void onPostExecute(Void unused) {
+                    try {
+                        mMediaPlayer = new MediaPlayer();
+                        mMediaPlayer.setDataSource(soundFile.getAbsolutePath());
+                        mMediaPlayer.prepare();
+                        mMediaPlayer.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute();
         }
     }
 }

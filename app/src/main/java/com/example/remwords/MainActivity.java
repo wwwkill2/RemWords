@@ -19,6 +19,7 @@ import com.example.remwords.ui.WordListActivity;
 import com.example.remwords.utils.SPUtils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         WordDetailActivity.startActivity(this, words, WordDetailActivity.Mode.REVIEW);
     }
 
-    public void studyWord(View view) {
+    public void studyWord(View view) throws IOException {
         WordListActivity.startActivity(this, WordDetailActivity.Mode.STUDY);
     }
 }

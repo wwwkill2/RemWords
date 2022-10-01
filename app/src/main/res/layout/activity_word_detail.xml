@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:gravity="center"
+        android:onClick="voice"
         android:textColor="@color/black"
         android:textSize="50sp"
         android:textStyle="bold"
@@ -66,5 +67,15 @@
             android:layout_weight="1"
             android:text="@string/btn_next_word" />
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="75dp"
+        android:onClick="voice"
+        android:src="@drawable/ic_sound" />
 
 </RelativeLayout>
