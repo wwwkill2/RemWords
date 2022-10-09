@@ -14,9 +14,10 @@ public class WordModel extends SQLiteOpenHelper {
     public static final String COLUMN_TRANS = "trans";
     public static final String COLUMN_KEY = "group_id";
     public static final String COLUMN_FORGET = "forget";
+    public static final String COLUMN_FORGET_TIMES = "forget_times";
 
     public WordModel(@Nullable Context context) {
-        super(context, DB_NAME, null, 1);
+        super(context, DB_NAME, null, 2);
     }
 
     @Override
@@ -29,11 +30,14 @@ public class WordModel extends SQLiteOpenHelper {
                 COLUMN_WORD + " TEXT PRIMARY KEY, " +
                 COLUMN_TRANS + " TEXT, " +
                 COLUMN_FORGET + " INTEGER DEFAULT 0 NOT NULL, " +
+                COLUMN_FORGET_TIMES + " INTEGER DEFAULT 0 NOT NULL, " +
                 COLUMN_KEY + " TEXT );");
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion == 1) {
+            db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_FORGET_TIMES + " INTEGER DEFAULT 0 NOT NULL;");
+        }
     }
 }

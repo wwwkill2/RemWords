@@ -23,6 +23,14 @@
         android:text="@string/btn_memo" />
 
     <Button
+        android:id="@+id/btn_important"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:onClick="importantWord"
+        android:text="@string/btn_important" />
+
+    <Button
         android:id="@+id/btn_study"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

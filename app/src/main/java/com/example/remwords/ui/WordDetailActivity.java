@@ -151,6 +151,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 String word = mWords.get(mCurWordIndex).word;
                 if (mMode == Mode.MEM) {
                     db.markForget(word);
+                    db.increaseForgetTimes(word);
                     mBtnNext.performClick();
                 } else if (mMode == Mode.REVIEW) {
                     db.markRemember(word);

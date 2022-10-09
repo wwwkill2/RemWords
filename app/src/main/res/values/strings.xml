@@ -9,5 +9,6 @@
     <string name="btn_confirm">确定</string>
     <string name="btn_search_word">搜单词</string>
     <string name="btn_memo">备忘录</string>
+    <string name="btn_important">重点记忆</string>
     <string name="btn_study">学单词</string>
 </resources>

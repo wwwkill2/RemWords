@@ -135,4 +135,14 @@ public class MainActivity extends AppCompatActivity {
     public void studyWord(View view) throws IOException {
         WordListActivity.startActivity(this, WordDetailActivity.Mode.STUDY);
     }
+
+    public void importantWord(View view) {
+        List<Word> words = db.queryImportantWords();
+        if (words.isEmpty()) {
+            Toast.makeText(this, "没有需要重点记忆的单词", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Collections.shuffle(words);
+        WordDetailActivity.startActivity(this, words, WordDetailActivity.Mode.REVIEW);
+    }
 }

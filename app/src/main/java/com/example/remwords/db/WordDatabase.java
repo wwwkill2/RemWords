@@ -58,6 +58,21 @@ public class WordDatabase {
         return res;
     }
 
+    public List<Word> queryImportantWords() {
+        Cursor cursor = null;
+        List<Word> res = new ArrayList<>();
+        try {
+            cursor = mWritableDatabase.rawQuery("select * from " + WordModel.TABLE_NAME + " where " +
+                    WordModel.COLUMN_FORGET_TIMES + ">1;", new String[0]);
+            while (cursor.moveToNext()) {
+                res.add(this.queryWordFromCursor(cursor));
+            }
+        } finally {
+            closeCursor(cursor);
+        }
+        return res;
+    }
+
     public List<Word> queryWordsByGroupId(String groupId) {
         Cursor cursor = null;
         List<Word> res = new ArrayList<>();
@@ -115,6 +130,11 @@ public class WordDatabase {
         cv.put(WordModel.COLUMN_FORGET, 1);
         mWritableDatabase.update(WordModel.TABLE_NAME, cv,
                 WordModel.COLUMN_WORD + "=?", new String[]{word});
+    }
+
+    public void increaseForgetTimes(String word) {
+        mWritableDatabase.execSQL("UPDATE " + WordModel.TABLE_NAME + " SET " + WordModel.COLUMN_FORGET_TIMES +
+                " = " + WordModel.COLUMN_FORGET_TIMES + " + 1 WHERE " + WordModel.COLUMN_WORD + "=?;", new String[]{word});
     }
 
     public void markRemember(String word) {
