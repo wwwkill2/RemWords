@@ -21,10 +21,29 @@ import com.example.remwords.ui.adapter.GroupInfo;
 import com.example.remwords.utils.RandomUtil;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class WordListActivity extends AppCompatActivity {
+
+    private Map<Integer, String> dayToGroup = new HashMap<>();
+
+    {
+        dayToGroup.put(Calendar.FRIDAY, "1~3");
+        dayToGroup.put(Calendar.SATURDAY, "4~6");
+        dayToGroup.put(Calendar.SUNDAY, "7~9");
+        dayToGroup.put(Calendar.MONDAY, "10~12");
+        dayToGroup.put(Calendar.TUESDAY, "13~15");
+        dayToGroup.put(Calendar.WEDNESDAY, "16~18");
+        dayToGroup.put(Calendar.THURSDAY, "19~21");
+    }
+
+    private int endGroupStartNum = 364;
 
     public static void startActivity(Context context, WordDetailActivity.Mode mode) {
         Intent intent = new Intent(context, WordListActivity.class);
@@ -36,7 +55,10 @@ public class WordListActivity extends AppCompatActivity {
 
     private WordDetailActivity.Mode mMode;
     private RecyclerView mRecyclerView;
+    private GroupAdapter mAdapter;
     private Button mBtnConfirm;
+    private Button mBtnYesterday;
+    private Button mBtnToday;
     private List<GroupInfo> mGroupInfos;
 
     @Override
@@ -69,8 +91,11 @@ public class WordListActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL));
-        mRecyclerView.setAdapter(new GroupAdapter(mGroupInfos));
+        mAdapter = new GroupAdapter(mGroupInfos);
+        mRecyclerView.setAdapter(mAdapter);
         mBtnConfirm = findViewById(R.id.btn_confirm);
+        mBtnYesterday = findViewById(R.id.btn_yesterday);
+        mBtnToday = findViewById(R.id.btn_today);
         mBtnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,6 +106,21 @@ public class WordListActivity extends AppCompatActivity {
                 }
                 WordDetailActivity.startActivity(WordListActivity.this,
                         selectedWords, mMode);
+            }
+        });
+        mBtnYesterday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, -1);
+                selectAllByDay(calendar);
+            }
+        });
+        mBtnToday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                selectAllByDay(calendar);
             }
         });
     }
@@ -97,5 +137,25 @@ public class WordListActivity extends AppCompatActivity {
             Collections.shuffle(res);
         }
         return res;
+    }
+
+    private void selectAllByDay(Calendar calendar) {
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        Set<String> selectedGroups = new HashSet<>();
+        String firstGroup = dayToGroup.get(dayOfWeek);
+        int start = Integer.parseInt(firstGroup.split("~")[0]);
+        int end = Integer.parseInt(firstGroup.split("~")[1]);
+        while (start <= endGroupStartNum) {
+            String group = start + "~" + end;
+            selectedGroups.add(group);
+            start += 21;
+            end += 21;
+        }
+        for (GroupInfo info : mGroupInfos) {
+            if (selectedGroups.contains(info.title)) {
+                info.setSelected(true);
+            }
+        }
+        mAdapter.notifyDataSetChanged();
     }
 }

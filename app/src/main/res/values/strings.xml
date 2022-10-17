@@ -6,6 +6,8 @@
     <string name="btn_prev_word">上一个</string>
     <string name="btn_next_word">下一个</string>
     <string name="btn_vague_word">模糊</string>
+    <string name="btn_yesterday">昨天</string>
+    <string name="btn_today">今天</string>
     <string name="btn_confirm">确定</string>
     <string name="btn_search_word">搜单词</string>
     <string name="btn_memo">备忘录</string>
